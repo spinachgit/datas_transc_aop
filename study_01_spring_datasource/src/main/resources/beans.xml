@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- <context annotation-config /> 
+		标签意义： 该标签隐式的向Spring容器注册了： AutowiredAnnotationBeanPostProcessor 
+		CommondAnnotationBeanPostProcessor PersistenceAnnotationBeanPostProcessor 
+		RequiredAnnotationBeanPostProcessor这四个BeanPostProcessor. 
+		
+		1.AutowiredAnnotationBeanPostProcessor:主要是使用@AutoWired注解时，必须提前向Spring容器注册这个BeanPostprocessor 
+		传统的配置方式：<bean class="org.springframework.beans.factory.annotation. AutowiredAnnotationBeanPostProcessor"/> 
+		2.CommondAnnotationBeanPostprocessor:主要是使用@Resource、@PostConstruct、@Predestory等注解时，必须提前向Spring容器注册。 
+		传统配置方式：<bean class="org.springframework.beans.factory.annotation.CommondAnnotationBeanPostprocessor"/> 
+		3.PersistenceAnnotationBeanPostProcessor :主要是使用@PersistenceContext注解时，必须提前向Spring容器注册。 
+		传统配置方式：<bean class="org.springframework.beans.factory.annotation.PersistenceAnnotationBeanPostProcessor"/> 
+		4.RequiredAnnotationBeanPostProcessor:主要是使用@Required注解时，必须提前向Spring容器注册。 
+		传统配置方式：<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/> 
+		一般来说，@Autowired注解比较常用，传统配置方式有点繁琐，而这种隐式配置方式就可以帮我们很容易的搞定。 
+		不过使用注解，我们一般都会配置扫描包路径：<context:component-scan base-package=com.xxx.xxx /> 
+		其实，给配置已经包含了自动注入上述Processor的功能，
+		所以，配置了包扫描之后，<context annotation-config />就可以移除了。 -->
+		
+	<context:component-scan base-package="com.spinach" />
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:jdbc.properties</value>
+		</property>
+	</bean>
+	
+	<!-- 
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/spring" />
+		<property name="username" value="root" />
+		<property name="password" value="pass" />
+	</bean>
+	 -->
+	<bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"> -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.spinach.model.User</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>
